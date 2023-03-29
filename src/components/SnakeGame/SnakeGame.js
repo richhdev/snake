@@ -17,6 +17,7 @@ const SnakeGame = (props) => {
   const requestAnimationFrameRef = useRef();
   const previousTimeRef = useRef(0);
   const gameSpeed = 150; // game refresh rate in milliseconds
+  const snakeWrap = true; // should the snake die when it hits a all or die
 
   // direction
   const initialDirection = "right";
@@ -125,7 +126,6 @@ const SnakeGame = (props) => {
       down: { xy: "y", val: 1 },
       left: { xy: "x", val: -1 },
     };
-    newArr[0][positionMap[direction].xy] += positionMap[direction].val;
 
     // switch (direction) {
     //   case "up":
@@ -145,6 +145,21 @@ const SnakeGame = (props) => {
     //     break;
     // }
 
+    const axis = positionMap[direction].xy; // are we updateing x or y
+    const updateVal = positionMap[direction].val; // what to add to the head value
+    newArr[0][axis] += updateVal; // update the head position
+
+    // snake should wrap when hitting a wall
+    if (snakeWrap) {
+      const minVal = 0;
+      const maxVal = axis === "x" ? gridWidth + 1 : gridHeight + 1;
+      if (newArr[0][axis] === minVal) {
+        newArr[0][axis] = maxVal - 1;
+      } else if (newArr[0][axis] === maxVal) {
+        newArr[0][axis] = minVal + 1;
+      }
+    }
+
     // update direction of head
     newArr[0].direction = direction;
 
@@ -161,12 +176,13 @@ const SnakeGame = (props) => {
     }
 
     const isOutsideGrid = isOutside();
-    if (isOutsideGrid) {
+    if (isOutsideGrid && !snakeWrap) {
       setGameOver(true);
     }
 
     const snakeEatItself = isSnakeIntersectItself();
     if (snakeEatItself) {
+      console.log("eat itself");
       setGameOver(true);
     }
 
@@ -222,6 +238,7 @@ const SnakeGame = (props) => {
         <Snake body={[...snakeBody]} />
         <Food pos={foodPos} />
       </GameBoard>
+      <pre>{snakeBody.map((item) => `x:${item.x} y: ${item.y} \n`)}</pre>
       <p>gane over: {gameOver ? "true" : "false"}</p>
     </>
   );
