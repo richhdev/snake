@@ -8,15 +8,18 @@ import GrapesSvg from "./assets/grapes.svg";
 import SnakeHeadSvg from "./assets/snake-head.svg";
 import SnakeBodySvg from "./assets/snake-body.svg";
 import SnakeBodyCornerSvg from "./assets/snake-body-corner.svg";
+import Button from "../Button";
+import Text from "../Text";
 
 const SnakeGame = (props) => {
   // game
+  const [gameState, setGameState] = useState("begin");
   const [gameOver, setGameOver] = useState(false);
   const gridWidth = 21;
   const gridHeight = 21;
   const requestAnimationFrameRef = useRef();
   const previousTimeRef = useRef(0);
-  const gameSpeed = 150; // game refresh rate in milliseconds
+  const gameSpeed = 200; // game refresh rate in milliseconds
   const snakeWrap = true; // should the snake die when it hits a all or die
 
   // direction
@@ -26,7 +29,7 @@ const SnakeGame = (props) => {
 
   // snake
   const initialSnake = [
-    { x: 2, y: 10, direction: "right" },
+    { x: 3, y: 9, direction: "right" },
     { x: 2, y: 9, direction: "down" },
     { x: 2, y: 8, direction: "down" },
     { x: 2, y: 7, direction: "down" },
@@ -35,7 +38,7 @@ const SnakeGame = (props) => {
   const snakeGrowAmount = 2; // how much does the snake grow when it eats food
 
   // food
-  const initalFood = { x: 10, y: 10 };
+  const initalFood = { x: 11, y: 9 };
   const [foodPos, setFoodPos] = useState(initalFood);
 
   // game loop
@@ -47,13 +50,16 @@ const SnakeGame = (props) => {
       cancelAnimationFrame(requestAnimationFrameRef.current);
       window.removeEventListener("keydown", updateDirection);
     };
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameOver, foodPos, direction]);
+  }, [gameState, gameOver, foodPos, direction]);
 
   const animate = (time) => {
+    if (gameState === "begin") {
+      return;
+    }
+
     if (gameOver === true) {
-      resetGame();
+      setGameState("end");
       return;
     }
 
@@ -67,13 +73,11 @@ const SnakeGame = (props) => {
   };
 
   function resetGame() {
-    if (confirm("GAME OVER. <br />play again?")) {
-      setSnakeBody(initialSnake);
-      setFoodPos(initalFood);
-      previousDirection.current = initialDirection;
-      setDirection(initialDirection);
-      setGameOver(false);
-    }
+    setSnakeBody(initialSnake);
+    setFoodPos(initalFood);
+    previousDirection.current = initialDirection;
+    setDirection(initialDirection);
+    setGameOver(false);
   }
 
   function updateDirection(e) {
@@ -190,7 +194,6 @@ const SnakeGame = (props) => {
 
     const snakeEatItself = isSnakeIntersectItself();
     if (snakeEatItself) {
-      console.log("eat itself");
       setGameOver(true);
     }
 
@@ -241,13 +244,40 @@ const SnakeGame = (props) => {
 
   return (
     <>
-      <GlobalStyle />
-      <GameBoard width={gridWidth} height={gridHeight}>
-        <Snake body={[...snakeBody]} />
-        <Food pos={foodPos} />
-      </GameBoard>
-      <pre>{snakeBody.map((item) => `x:${item.x} y: ${item.y} \n`)}</pre>
+      <Outer>
+        <GlobalStyle />
+
+        {gameState === "begin" && (
+          <GameModal>
+            <Button onClick={() => setGameState("playing")}>Start Game</Button>
+          </GameModal>
+        )}
+
+        {gameState === "end" && (
+          <GameModal>
+            <center>
+              <Text>Better luck next time</Text>
+              <br />
+              <Button
+                onClick={() => {
+                  resetGame();
+                  setGameState("playing");
+                }}
+              >
+                Start again
+              </Button>
+            </center>
+          </GameModal>
+        )}
+
+        <GameBoard width={gridWidth} height={gridHeight}>
+          <Snake body={[...snakeBody]} />
+          <Food pos={foodPos} />
+        </GameBoard>
+      </Outer>
+      {/* <pre>{snakeBody.map((item) => `x:${item.x} y: ${item.y} \n`)}</pre>
       <p>gane over: {gameOver ? "true" : "false"}</p>
+      <p>direction: {direction}</p> */}
     </>
   );
 };
@@ -449,3 +479,21 @@ const FoodOuter = styled.div.attrs((props) => {
 function getRandomNumBetween(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
+
+// game state ////
+const Outer = styled.div`
+  position: relative;
+`;
+
+const GameModal = styled.div`
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background: ${(props) =>
+    props.theme.isDark ? `rgba(0, 0, 0, 0.9)` : `rgba(255, 255, 255, 0.9)`};
+  border-radius: 6px;
+
+  display: grid;
+  place-items: center;
+`;
