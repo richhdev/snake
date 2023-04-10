@@ -1,18 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ThemeProvider } from "styled-components";
 import Head from "next/head";
 import GlobalMeta from "@/components/GlobalMeta";
 import { themeDark, themeLight } from "@/theme";
 import ThemeSwitch from "@/components/ThemeSwitch";
 import GradientBackground from "@/components/GradientBackground";
-import {
-  Footer,
-  Header,
-  IconLink,
-  Main,
-  Outer,
-  StartButton,
-} from "./_components";
+import { Outer, Header, Main, Footer, IconLink } from "./_components";
 import GithubSvg from "@/images/github-icon.svg";
 import Tagline from "@/components/Tagline";
 import SnakeGame from "@/components/SnakeGame";
@@ -49,11 +42,9 @@ export default function Home() {
           <Main>
             <div>
               <Tagline text={"<SnakeJs />"} /> <br />
-              <StartButton>Start</StartButton>
             </div>
-            <div>
-              <SnakeGame />
-            </div>
+
+            <SnakeGame />
           </Main>
           <Footer>
             <IconLink
