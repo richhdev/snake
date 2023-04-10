@@ -77,6 +77,14 @@ const SnakeGame = (props) => {
   }
 
   function updateDirection(e) {
+    if (
+      e.key === "ArrowUp" ||
+      e.key === "ArrowRight" ||
+      e.key === "ArrowDown" ||
+      e.key === "Arrow"
+    )
+      e.preventDefault(); // prevent the page form scrolling when user hits arrow keys
+
     // let nextDirection = direction;
 
     // switch (e.key) {
