@@ -9,6 +9,10 @@ import SnakeHeadSvg from "./assets/snake-head.svg";
 import SnakeBodySvg from "./assets/snake-body.svg";
 import SnakeBodyCornerSvg from "./assets/snake-body-corner.svg";
 import SnakeTailSvg from "./assets/snake-tail.svg";
+import ArrowUpSvg from "./assets/arrow-up.svg";
+import ArrowLeftSvg from "./assets/arrow-left.svg";
+import ArrowDownSvg from "./assets/arrow-down.svg";
+import ArrowRightSvg from "./assets/arrow-right.svg";
 import Button from "../Button";
 import Text from "../Text";
 
@@ -85,6 +89,7 @@ const SnakeGame = (props) => {
     setGameOver(false);
   }
 
+  // keyboard input
   function updateDirection(e) {
     // prevent the page form scrolling when user hits arrow keys
     if (
@@ -106,6 +111,26 @@ const SnakeGame = (props) => {
     const nextDirection = directionMap[e.key];
     setDirection(nextDirection || direction);
   }
+
+  // mobile buttons
+  function updateDirectionMobile(newDir) {
+    const directionMap = {
+      ArrowUp: previousDirection.current !== "down" ? "up" : false,
+      ArrowRight: previousDirection.current !== "left" ? "right" : false,
+      ArrowDown: previousDirection.current !== "up" ? "down" : false,
+      ArrowLeft: previousDirection.current !== "right" ? "left" : false,
+    };
+
+    const nextDirection = directionMap[newDir];
+    setDirection(nextDirection || direction);
+  }
+
+  const directionMap = {
+    ArrowUp: previousDirection.current !== "down" ? "up" : false,
+    ArrowRight: previousDirection.current !== "left" ? "right" : false,
+    ArrowDown: previousDirection.current !== "up" ? "down" : false,
+    ArrowLeft: previousDirection.current !== "right" ? "left" : false,
+  };
 
   function updateSnake() {
     let newArr = snakeBody;
@@ -212,36 +237,42 @@ const SnakeGame = (props) => {
   }
 
   return (
-    <Outer>
-      {gameState === "begin" && (
-        <GameModal>
-          <Button onClick={() => setGameState("playing")}>Start Game</Button>
-        </GameModal>
-      )}
+    <>
+      <Outer>
+        {gameState === "begin" && (
+          <GameModal>
+            <Button onClick={() => setGameState("playing")}>Start Game</Button>
+          </GameModal>
+        )}
 
-      {gameState === "end" && (
-        <GameModal>
-          <center>
-            <Text>Score {score}</Text>
-            <Text>Better luck next time</Text>
-            <br />
-            <Button
-              onClick={() => {
-                resetGame();
-                setGameState("playing");
-              }}
-            >
-              Start again
-            </Button>
-          </center>
-        </GameModal>
-      )}
+        {gameState === "end" && (
+          <GameModal>
+            <center>
+              <Text>Score {score}</Text>
+              <Text>Better luck next time</Text>
+              <br />
+              <Button
+                onClick={() => {
+                  resetGame();
+                  setGameState("playing");
+                }}
+              >
+                Start again
+              </Button>
+            </center>
+          </GameModal>
+        )}
 
-      <GameBoard width={gridWidth} height={gridHeight}>
-        <Snake body={[...snakeBody]} />
-        <Food pos={foodPos} />
-      </GameBoard>
-    </Outer>
+        <GameBoard width={gridWidth} height={gridHeight}>
+          <Snake body={[...snakeBody]} />
+          <Food pos={foodPos} />
+        </GameBoard>
+      </Outer>
+
+      {gameState === "playing" && (
+        <MobileControls updateDirection={updateDirectionMobile} />
+      )}
+    </>
   );
 };
 
@@ -465,6 +496,60 @@ const FoodOuter = styled.div.attrs((props) => {
     float: left;
     display: block;
     width: 100%;
+  }
+`;
+
+// Mobile controls /////////////////////////////////////////////////////////////
+const MobileControls = (props) => {
+  return (
+    <MobileContolsGrid>
+      <div></div>
+      <Button
+        onClick={() => {
+          props.updateDirection("ArrowUp");
+        }}
+      >
+        <ArrowUpSvg />
+      </Button>
+      <div></div>
+      <Button
+        onClick={() => {
+          props.updateDirection("ArrowLeft");
+        }}
+      >
+        <ArrowLeftSvg />
+      </Button>
+      <Button
+        onClick={() => {
+          props.updateDirection("ArrowDown");
+        }}
+      >
+        <ArrowDownSvg />
+      </Button>
+      <Button
+        onClick={() => {
+          props.updateDirection("ArrowRight");
+        }}
+      >
+        <ArrowRightSvg />
+      </Button>
+    </MobileContolsGrid>
+  );
+};
+
+const MobileContolsGrid = styled.div`
+  /* only display on touch devices */
+  display: none;
+
+  @media (hover: none) and (pointer: coarse) {
+    display: grid;
+    grid: 1fr 1fr / 1fr 1fr 1fr;
+    gap: 8px;
+    text-align: center;
+
+    svg {
+      display: block;
+    }
   }
 `;
 

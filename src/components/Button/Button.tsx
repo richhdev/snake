@@ -55,14 +55,14 @@ const animationButtonActive = keyframes`
 const ButtonText = styled.span``;
 
 const LoadingIcon = styled.span`
-  display: inline-block;
+  /* display: inline-block; */
   width: ${fz.pResponsive};
   height: ${fz.pResponsive};
   margin-right: calc(${fz.pResponsive} / 2);
 `;
 
 const ButtonOuter = styled.span.attrs(() => {})<ButtonOuterProps>`
-  display: inline-block;
+  /* display: inline-block; */
 
   ${(props) =>
     props.$loading &&
@@ -92,7 +92,7 @@ const ButtonInner = styled.button.attrs(() => {})<ButtonProps>`
 
   /* default styles */
   position: relative;
-  display: inline-block;
+  /* display: inline-block; */
   padding: calc(${fz.pResponsive} / 2) ${fz.pResponsive};
   margin-bottom: 0;
   font-family: ${ff.p};
@@ -116,7 +116,7 @@ const ButtonInner = styled.button.attrs(() => {})<ButtonProps>`
     transition: ${defaultTransition};
 
     ${ButtonText} {
-      display: inline-block;
+      /* display: inline-block; */
       transition: all 150ms ease-out;
     }
   }
