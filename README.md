@@ -1,6 +1,6 @@
 ## Snake JS
 
-An simple snake game written in React.
+A simple snake game written in React.
 
 (In development, see `dev` branch)
 
