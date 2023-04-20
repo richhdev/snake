@@ -8,6 +8,7 @@ import GrapesSvg from "./assets/grapes.svg";
 import SnakeHeadSvg from "./assets/snake-head.svg";
 import SnakeBodySvg from "./assets/snake-body.svg";
 import SnakeBodyCornerSvg from "./assets/snake-body-corner.svg";
+import SnakeTailSvg from "./assets/snake-tail.svg";
 import Button from "../Button";
 import Text from "../Text";
 
@@ -19,8 +20,10 @@ const SnakeGame = (props) => {
   const gridHeight = 21;
   const requestAnimationFrameRef = useRef();
   const previousTimeRef = useRef(0);
-  const gameSpeed = 200; // game refresh rate in milliseconds
+  const initialGameSpeed = 250;
+  const [gameSpeed, setGameSpeed] = useState(initialGameSpeed); // game refresh rate in milliseconds
   const snakeWrap = true; // should the snake die when it hits a all or die
+  const [score, setScore] = useState(0);
 
   // direction
   const initialDirection = "right";
@@ -77,40 +80,21 @@ const SnakeGame = (props) => {
     setFoodPos(initalFood);
     previousDirection.current = initialDirection;
     setDirection(initialDirection);
+    setGameSpeed(initialGameSpeed);
+    setScore(0);
     setGameOver(false);
   }
 
   function updateDirection(e) {
+    // prevent the page form scrolling when user hits arrow keys
     if (
       e.key === "ArrowUp" ||
       e.key === "ArrowRight" ||
       e.key === "ArrowDown" ||
       e.key === "Arrow"
-    )
-      e.preventDefault(); // prevent the page form scrolling when user hits arrow keys
-
-    // let nextDirection = direction;
-
-    // switch (e.key) {
-    //   case "ArrowUp":
-    //     nextDirection = previousDirection.current !== "down" ? "up" : direction;
-    //     break;
-
-    //   case "ArrowRight":
-    //     nextDirection =
-    //       previousDirection.current !== "left" ? "right" : direction;
-    //     break;
-
-    //   case "ArrowDown":
-    //     nextDirection = previousDirection.current !== "up" ? "down" : direction;
-    //     break;
-
-    //   case "ArrowLeft":
-    //     nextDirection =
-    //       previousDirection.current !== "right" ? "left" : direction;
-    //     break;
-    // }
-    // setDirection(nextDirection);
+    ) {
+      e.preventDefault();
+    }
 
     const directionMap = {
       ArrowUp: previousDirection.current !== "down" ? "up" : false,
@@ -126,7 +110,7 @@ const SnakeGame = (props) => {
   function updateSnake() {
     let newArr = snakeBody;
 
-    // update position of each snake segment
+    // update position of each snake segment (except head)
     for (let i = snakeBody.length - 2; i >= 0; i--) {
       newArr[i + 1] = { ...snakeBody[i] };
     }
@@ -138,24 +122,6 @@ const SnakeGame = (props) => {
       down: { xy: "y", val: 1 },
       left: { xy: "x", val: -1 },
     };
-
-    // switch (direction) {
-    //   case "up":
-    //     newArr[0].y += -1;
-    //     break;
-
-    //   case "right":
-    //     newArr[0].x += 1;
-    //     break;
-
-    //   case "down":
-    //     newArr[0].y += 1;
-    //     break;
-
-    //   case "left":
-    //     newArr[0].x += -1;
-    //     break;
-    // }
 
     const axis = positionMap[direction].xy; // are we updateing x or y
     const updateVal = positionMap[direction].val; // what to add to the head value
@@ -182,6 +148,9 @@ const SnakeGame = (props) => {
       for (let i = 0; i < snakeGrowAmount; i++) {
         newArr.push({ ...newArr[newArr.length - 1] });
       }
+
+      setScore(score + 1);
+      setGameSpeed(gameSpeed - 5);
 
       // update the position of the food
       setFoodPos(newFoodPos());
@@ -243,42 +212,36 @@ const SnakeGame = (props) => {
   }
 
   return (
-    <>
-      <Outer>
-        <GlobalStyle />
+    <Outer>
+      {gameState === "begin" && (
+        <GameModal>
+          <Button onClick={() => setGameState("playing")}>Start Game</Button>
+        </GameModal>
+      )}
 
-        {gameState === "begin" && (
-          <GameModal>
-            <Button onClick={() => setGameState("playing")}>Start Game</Button>
-          </GameModal>
-        )}
+      {gameState === "end" && (
+        <GameModal>
+          <center>
+            <Text>Score {score}</Text>
+            <Text>Better luck next time</Text>
+            <br />
+            <Button
+              onClick={() => {
+                resetGame();
+                setGameState("playing");
+              }}
+            >
+              Start again
+            </Button>
+          </center>
+        </GameModal>
+      )}
 
-        {gameState === "end" && (
-          <GameModal>
-            <center>
-              <Text>Better luck next time</Text>
-              <br />
-              <Button
-                onClick={() => {
-                  resetGame();
-                  setGameState("playing");
-                }}
-              >
-                Start again
-              </Button>
-            </center>
-          </GameModal>
-        )}
-
-        <GameBoard width={gridWidth} height={gridHeight}>
-          <Snake body={[...snakeBody]} />
-          <Food pos={foodPos} />
-        </GameBoard>
-      </Outer>
-      {/* <pre>{snakeBody.map((item) => `x:${item.x} y: ${item.y} \n`)}</pre>
-      <p>gane over: {gameOver ? "true" : "false"}</p>
-      <p>direction: {direction}</p> */}
-    </>
+      <GameBoard width={gridWidth} height={gridHeight}>
+        <Snake body={[...snakeBody]} />
+        <Food pos={foodPos} />
+      </GameBoard>
+    </Outer>
   );
 };
 
@@ -286,11 +249,30 @@ export default SnakeGame;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// Global Styles //////////////////////
+const Outer = styled.div`
+  position: relative;
+`;
 
-const GlobalStyle = createGlobalStyle``;
+const GameModal = styled.div`
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background: ${(props) =>
+    props.theme.isDark ? `rgba(0, 0, 0, 0.9)` : `rgba(255, 255, 255, 0.9)`};
+  border-radius: 6px;
 
-// Game
+  display: grid;
+  place-items: center;
+`;
+
+const ScoreText = styled(Text)`
+  position: absolute;
+  text-align: center;
+  width: 100%;
+`;
+
+// Game ////////////////////////////////////////////////////////////////////////
 const GameBoard = styled.div.attrs((props) => {
   return {
     style: {
@@ -307,7 +289,7 @@ const GameBoard = styled.div.attrs((props) => {
   display: grid;
 `;
 
-// Snake /////////////////////////////
+// Snake ///////////////////////////////////////////////////////////////////////
 const Snake = (props) => {
   return (
     <>
@@ -326,19 +308,12 @@ const Snake = (props) => {
                 nextBody={props.body[i + 1]}
               />
             )}
-            {isTail && <SnakeTail direction={direction} />}
+            {isTail && <SnakeTail direction={props.body[i - 1].direction} />}
           </SnakeSegment>
         );
       })}
     </>
   );
-};
-
-const directionRotateMap = {
-  right: "-90deg",
-  down: "0deg",
-  left: "90deg",
-  up: "-180deg",
 };
 
 const SnakeSegment = styled.div.attrs((props) => {
@@ -378,9 +353,9 @@ const SnakeHeadOuter = styled.div.attrs((props) => {
   justify-content: center;
 
   svg {
-    position: absolute;
+    /* position: absolute;
     display: block;
-    width: 150%;
+    width: 150%; */
   }
 `;
 
@@ -426,19 +401,37 @@ const SnakeBody = ({ direction, prevBody, nextBody }) => {
 const SnakeBodyOuter = styled.div`
   width: 100%;
   height: 100%;
-
   svg {
     width: 100%;
   }
 `;
 
-const SnakeTail = styled.div`
-  background: purple;
+const SnakeTail = (props) => {
+  return (
+    <SnakeTailOuter direction={props.direction}>
+      <SnakeTailSvg />
+    </SnakeTailOuter>
+  );
+};
+
+const SnakeTailOuter = styled.div.attrs((props) => {
+  return {
+    style: {
+      transform: `rotate(${directionRotateMap[props.direction]})`,
+    },
+  };
+})`
   width: 100%;
-  height: 100%;
 `;
 
-// Food ///////////////////////////////
+const directionRotateMap = {
+  right: "-90deg",
+  down: "0deg",
+  left: "90deg",
+  up: "-180deg",
+};
+
+// Food ////////////////////////////////////////////////////////////////////////
 const Food = (props) => {
   const [icon, setIcon] = useState();
 
@@ -475,25 +468,7 @@ const FoodOuter = styled.div.attrs((props) => {
   }
 `;
 
-// Functions ///////////////////////////////
+// Functions ///////////////////////////////////////////////////////////////////
 function getRandomNumBetween(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
-
-// game state ////
-const Outer = styled.div`
-  position: relative;
-`;
-
-const GameModal = styled.div`
-  position: absolute;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  background: ${(props) =>
-    props.theme.isDark ? `rgba(0, 0, 0, 0.9)` : `rgba(255, 255, 255, 0.9)`};
-  border-radius: 6px;
-
-  display: grid;
-  place-items: center;
-`;
