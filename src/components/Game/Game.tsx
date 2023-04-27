@@ -1,20 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import styled, { createGlobalStyle } from "styled-components";
-import AppleSvg from "./assets/apple.svg";
-import AvocadoSvg from "./assets/avocado.svg";
-import BurgerSvg from "./assets/burger.svg";
-import CheeseSvg from "./assets/cheese.svg";
-import GrapesSvg from "./assets/grapes.svg";
-import SnakeHeadSvg from "./assets/snake-head.svg";
-import SnakeBodySvg from "./assets/snake-body.svg";
-import SnakeBodyCornerSvg from "./assets/snake-body-corner.svg";
-import SnakeTailSvg from "./assets/snake-tail.svg";
-import ArrowUpSvg from "./assets/arrow-up.svg";
-import ArrowLeftSvg from "./assets/arrow-left.svg";
-import ArrowDownSvg from "./assets/arrow-down.svg";
-import ArrowRightSvg from "./assets/arrow-right.svg";
+import styled from "styled-components";
+import { getRandomNumBetween } from "@/utils/getRandomNumBetween";
 import Button from "../Button";
 import Text from "../Text";
+import GameBoard from "../GameBoard";
+import Snake from "../Snake";
+import Food from "../Food";
+import TouchControls from "../TouchControls/TouchControls";
 
 const SnakeGame = () => {
   // game
@@ -63,6 +55,7 @@ const SnakeGame = () => {
       cancelAnimationFrame(requestAnimationFrameRef.current);
       window.removeEventListener("keydown", updateDirection);
     };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState, gameOver, foodPos, direction]);
 
@@ -97,14 +90,13 @@ const SnakeGame = () => {
 
   // keyboard input
   function updateDirection(e: KeyboardEvent) {
-    // prevent the page form scrolling when user hits arrow keys
     if (
       e.key === "ArrowUp" ||
       e.key === "ArrowRight" ||
       e.key === "ArrowDown" ||
       e.key === "ArrowLeft"
     ) {
-      e.preventDefault();
+      e.preventDefault(); // prevent the page form scrolling when user hits up / down keys
 
       const directionMap = {
         ArrowUp: previousDirection.current !== "down" ? "up" : false,
@@ -125,8 +117,8 @@ const SnakeGame = () => {
     }
   }
 
-  // mobile buttons
-  function updateDirectionMobile(
+  // touch controls
+  function updateDirectionTouch(
     newDir: "ArrowUp" | "ArrowRight" | "ArrowDown" | "ArrowLeft"
   ) {
     const directionMap = {
@@ -293,15 +285,13 @@ const SnakeGame = () => {
       </Outer>
 
       {gameState === "playing" && (
-        <MobileControls updateDirection={updateDirectionMobile} />
+        <TouchControls updateDirection={updateDirectionTouch} />
       )}
     </>
   );
 };
 
 export default SnakeGame;
-
-////////////////////////////////////////////////////////////////////////////////
 
 const Outer = styled.div`
   position: relative;
@@ -319,292 +309,3 @@ const GameModal = styled.div`
   display: grid;
   place-items: center;
 `;
-
-const ScoreText = styled(Text)`
-  position: absolute;
-  text-align: center;
-  width: 100%;
-`;
-
-// Game ////////////////////////////////////////////////////////////////////////
-type GameBoardProps = { width: number; height: number };
-
-const GameBoard = styled.div.attrs((props: GameBoardProps) => {
-  return {
-    style: {
-      grid: `repeat(${props.width}, 1fr) / repeat(${props.height}, 1fr)`,
-    },
-  };
-})<GameBoardProps>`
-  background-color: ${(props) => (props.theme.isDark ? "black" : "white")};
-  width: 100vw;
-  aspect-ratio: 1/1;
-  max-width: 768px;
-  border-radius: 6px;
-
-  display: grid;
-`;
-
-// Snake ///////////////////////////////////////////////////////////////////////
-type SnakeProps = {
-  body: Array<{
-    x: number;
-    y: number;
-    direction: "up" | "down" | "left" | "right";
-  }>;
-};
-
-const Snake = (props: SnakeProps) => {
-  return (
-    <>
-      {props.body.map(({ x, y, direction }, i: number) => {
-        const isHead = i == 0;
-        const isBody = i != 0 && i != props.body.length - 1;
-        const isTail = i == props.body.length - 1;
-
-        return (
-          <SnakeSegment key={`snake-segment-${i}`} x={x} y={y}>
-            {isHead && <SnakeHead direction={direction} />}
-            {isBody && (
-              <SnakeBody
-                direction={direction}
-                prevBody={props.body[i - 1]}
-                // nextBody={props.body[i + 1]}
-              />
-            )}
-            {isTail && <SnakeTail direction={props.body[i - 1].direction} />}
-          </SnakeSegment>
-        );
-      })}
-    </>
-  );
-};
-
-type SnakeSegmentProps = { x: number; y: number };
-
-const SnakeSegment = styled.div.attrs((props: SnakeSegmentProps) => {
-  return {
-    style: {
-      gridColumnStart: props.x,
-      gridRowStart: props.y,
-    },
-  };
-})<SnakeSegmentProps>`
-  width: 100%;
-  height: 100%;
-
-  svg {
-    display: block;
-  }
-`;
-
-type SnakeHeadProps = { direction: "up" | "down" | "left" | "right" };
-
-const SnakeHead = (props: SnakeHeadProps) => {
-  return (
-    <SnakeHeadOuter direction={props.direction}>
-      <SnakeHeadSvg />
-    </SnakeHeadOuter>
-  );
-};
-
-const SnakeHeadOuter = styled.div.attrs((props: SnakeHeadProps) => {
-  return {
-    style: {
-      transform: `rotate(${directionRotateMap[props.direction]})`,
-    },
-  };
-})<SnakeHeadProps>`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-
-  svg {
-    position: absolute;
-    display: block;
-    width: 150%;
-  }
-`;
-
-type SnakeBodyProps = {
-  direction: "up" | "down" | "left" | "right";
-  prevBody: {
-    x: number;
-    y: number;
-    direction: "up" | "down" | "left" | "right";
-  };
-};
-
-const SnakeBody = ({ direction, prevBody }: SnakeBodyProps) => {
-  const isBLCorner =
-    (direction == "down" && prevBody.direction == "right") ||
-    (direction == "left" && prevBody.direction == "up");
-
-  const isBRCorner =
-    (direction == "down" && prevBody.direction == "left") ||
-    (direction == "right" && prevBody.direction == "up");
-
-  const isTLCorner =
-    (direction == "up" && prevBody.direction == "right") ||
-    (direction == "left" && prevBody.direction == "down");
-
-  const isTRCorner =
-    (direction == "up" && prevBody.direction == "left") ||
-    (direction == "right" && prevBody.direction == "down");
-
-  return (
-    <SnakeBodyOuter>
-      {isBLCorner ? (
-        <SnakeBodyCornerSvg />
-      ) : isBRCorner ? (
-        <SnakeBodyCornerSvg style={{ transform: "rotate(-90deg)" }} />
-      ) : isTLCorner ? (
-        <SnakeBodyCornerSvg style={{ transform: "rotate(90deg)" }} />
-      ) : isTRCorner ? (
-        <SnakeBodyCornerSvg style={{ transform: "rotate(-180deg)" }} />
-      ) : (
-        <SnakeBodySvg
-          style={{
-            transform:
-              (direction == "left" || direction == "right") && "rotate(-90deg)",
-          }}
-        />
-      )}
-    </SnakeBodyOuter>
-  );
-};
-
-const SnakeBodyOuter = styled.div`
-  width: 100%;
-  height: 100%;
-  svg {
-    width: 100%;
-  }
-`;
-
-type SnakeTailProps = SnakeHeadProps;
-
-const SnakeTail = (props: SnakeTailProps) => {
-  return (
-    <SnakeTailOuter direction={props.direction}>
-      <SnakeTailSvg />
-    </SnakeTailOuter>
-  );
-};
-
-const SnakeTailOuter = styled.div.attrs((props: SnakeTailProps) => {
-  return {
-    style: {
-      transform: `rotate(${directionRotateMap[props.direction]})`,
-    },
-  };
-})<SnakeTailProps>`
-  width: 100%;
-`;
-
-const directionRotateMap = {
-  right: "-90deg",
-  down: "0deg",
-  left: "90deg",
-  up: "-180deg",
-};
-
-// Food ////////////////////////////////////////////////////////////////////////
-type FoodProps = { pos: { x: number; y: number } };
-
-const foodArray = [
-  <AppleSvg key="apple" />,
-  <AvocadoSvg key="avo" />,
-  <BurgerSvg key="burger" />,
-  <CheeseSvg key="cheese" />,
-  <GrapesSvg key="grapes" />,
-];
-
-const Food = (props: FoodProps) => {
-  const [icon, setIcon] = useState(<AppleSvg key="apple" />);
-
-  useEffect(() => {
-    const num = getRandomNumBetween(0, foodArray.length);
-    setIcon(foodArray[num]);
-  }, [props.pos]);
-
-  return <FoodOuter pos={props.pos}>{icon}</FoodOuter>;
-};
-
-const FoodOuter = styled.div.attrs((props: FoodProps) => {
-  return {
-    style: {
-      gridColumnStart: props.pos.x,
-      gridRowStart: props.pos.y,
-    },
-  };
-})<FoodProps>`
-  width: 100%;
-  height: 100%;
-
-  svg {
-    float: left;
-    display: block;
-    width: 100%;
-  }
-`;
-
-// Mobile controls /////////////////////////////////////////////////////////////
-const MobileControls = (props: { updateDirection: Function }) => {
-  return (
-    <MobileContolsGrid>
-      <div></div>
-      <Button
-        onClick={() => {
-          props.updateDirection("ArrowUp");
-        }}
-      >
-        <ArrowUpSvg />
-      </Button>
-      <div></div>
-      <Button
-        onClick={() => {
-          props.updateDirection("ArrowLeft");
-        }}
-      >
-        <ArrowLeftSvg />
-      </Button>
-      <Button
-        onClick={() => {
-          props.updateDirection("ArrowDown");
-        }}
-      >
-        <ArrowDownSvg />
-      </Button>
-      <Button
-        onClick={() => {
-          props.updateDirection("ArrowRight");
-        }}
-      >
-        <ArrowRightSvg />
-      </Button>
-    </MobileContolsGrid>
-  );
-};
-
-const MobileContolsGrid = styled.div`
-  /* only display on touch devices */
-  display: none;
-
-  @media (hover: none) and (pointer: coarse) {
-    display: grid;
-    grid: 1fr 1fr / 1fr 1fr 1fr;
-    gap: 8px;
-    text-align: center;
-
-    svg {
-      display: block;
-    }
-  }
-`;
-
-// Functions ///////////////////////////////////////////////////////////////////
-function getRandomNumBetween(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min) + min);
-}

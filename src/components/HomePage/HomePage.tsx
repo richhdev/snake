@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ThemeProvider } from "styled-components";
 import Head from "next/head";
 import GlobalMeta from "@/components/GlobalMeta";
@@ -8,7 +8,7 @@ import GradientBackground from "@/components/GradientBackground";
 import { Outer, Header, Main, Footer, IconLink } from "./_components";
 import GithubSvg from "@/images/github-icon.svg";
 import Tagline from "@/components/Tagline";
-import SnakeGame from "@/components/SnakeGame";
+import Game from "@/components/Game";
 
 export default function Home() {
   const [theme, setTheme] = useState(themeLight);
@@ -40,11 +40,8 @@ export default function Home() {
             <ThemeSwitch callback={setThemeSwitch} />
           </Header>
           <Main>
-            <div>
-              <Tagline text={"<SnakeJs />"} /> <br />
-            </div>
-
-            <SnakeGame />
+            <Tagline text={"<SnakeJs />"} />
+            <Game />
           </Main>
           <Footer>
             <IconLink
