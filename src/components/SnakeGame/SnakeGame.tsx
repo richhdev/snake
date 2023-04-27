@@ -16,13 +16,13 @@ import ArrowRightSvg from "./assets/arrow-right.svg";
 import Button from "../Button";
 import Text from "../Text";
 
-const SnakeGame = (props) => {
+const SnakeGame = () => {
   // game
   const [gameState, setGameState] = useState("begin");
   const [gameOver, setGameOver] = useState(false);
   const gridWidth = 21;
   const gridHeight = 21;
-  const requestAnimationFrameRef = useRef();
+  const requestAnimationFrameRef = useRef(0);
   const previousTimeRef = useRef(0);
   const initialGameSpeed = 250;
   const [gameSpeed, setGameSpeed] = useState(initialGameSpeed); // game refresh rate in milliseconds
@@ -32,10 +32,16 @@ const SnakeGame = (props) => {
   // direction
   const initialDirection = "right";
   const previousDirection = useRef(initialDirection);
-  const [direction, setDirection] = useState(initialDirection);
+  const [direction, setDirection] = useState<"up" | "right" | "down" | "left">(
+    initialDirection
+  );
 
   // snake
-  const initialSnake = [
+  const initialSnake: Array<{
+    x: number;
+    y: number;
+    direction: "up" | "down" | "left" | "right";
+  }> = [
     { x: 3, y: 9, direction: "right" },
     { x: 2, y: 9, direction: "down" },
     { x: 2, y: 8, direction: "down" },
@@ -60,7 +66,7 @@ const SnakeGame = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState, gameOver, foodPos, direction]);
 
-  const animate = (time) => {
+  const animate = (time: number) => {
     if (gameState === "begin") {
       return;
     }
@@ -90,30 +96,39 @@ const SnakeGame = (props) => {
   }
 
   // keyboard input
-  function updateDirection(e) {
+  function updateDirection(e: KeyboardEvent) {
     // prevent the page form scrolling when user hits arrow keys
     if (
       e.key === "ArrowUp" ||
       e.key === "ArrowRight" ||
       e.key === "ArrowDown" ||
-      e.key === "Arrow"
+      e.key === "ArrowLeft"
     ) {
       e.preventDefault();
+
+      const directionMap = {
+        ArrowUp: previousDirection.current !== "down" ? "up" : false,
+        ArrowRight: previousDirection.current !== "left" ? "right" : false,
+        ArrowDown: previousDirection.current !== "up" ? "down" : false,
+        ArrowLeft: previousDirection.current !== "right" ? "left" : false,
+      };
+
+      const nextDirection = directionMap[e.key];
+      if (
+        nextDirection === "up" ||
+        nextDirection === "right" ||
+        nextDirection === "down" ||
+        nextDirection === "left"
+      ) {
+        setDirection(nextDirection);
+      }
     }
-
-    const directionMap = {
-      ArrowUp: previousDirection.current !== "down" ? "up" : false,
-      ArrowRight: previousDirection.current !== "left" ? "right" : false,
-      ArrowDown: previousDirection.current !== "up" ? "down" : false,
-      ArrowLeft: previousDirection.current !== "right" ? "left" : false,
-    };
-
-    const nextDirection = directionMap[e.key];
-    setDirection(nextDirection || direction);
   }
 
   // mobile buttons
-  function updateDirectionMobile(newDir) {
+  function updateDirectionMobile(
+    newDir: "ArrowUp" | "ArrowRight" | "ArrowDown" | "ArrowLeft"
+  ) {
     const directionMap = {
       ArrowUp: previousDirection.current !== "down" ? "up" : false,
       ArrowRight: previousDirection.current !== "left" ? "right" : false,
@@ -122,15 +137,15 @@ const SnakeGame = (props) => {
     };
 
     const nextDirection = directionMap[newDir];
-    setDirection(nextDirection || direction);
+    if (
+      nextDirection === "up" ||
+      nextDirection === "right" ||
+      nextDirection === "down" ||
+      nextDirection === "left"
+    ) {
+      setDirection(nextDirection);
+    }
   }
-
-  const directionMap = {
-    ArrowUp: previousDirection.current !== "down" ? "up" : false,
-    ArrowRight: previousDirection.current !== "left" ? "right" : false,
-    ArrowDown: previousDirection.current !== "up" ? "down" : false,
-    ArrowLeft: previousDirection.current !== "right" ? "left" : false,
-  };
 
   function updateSnake() {
     let newArr = snakeBody;
@@ -141,14 +156,19 @@ const SnakeGame = (props) => {
     }
 
     // update position of head
-    const positionMap = {
+    const positionMap: {
+      up: { xy: "y"; val: -1 };
+      right: { xy: "x"; val: 1 };
+      down: { xy: "y"; val: 1 };
+      left: { xy: "x"; val: -1 };
+    } = {
       up: { xy: "y", val: -1 },
       right: { xy: "x", val: 1 },
       down: { xy: "y", val: 1 },
       left: { xy: "x", val: -1 },
     };
 
-    const axis = positionMap[direction].xy; // are we updateing x or y
+    const axis: "x" | "y" = positionMap[direction].xy; // are we updateing x or y
     const updateVal = positionMap[direction].val; // what to add to the head value
     newArr[0][axis] += updateVal; // update the head position
 
@@ -194,12 +214,15 @@ const SnakeGame = (props) => {
     setSnakeBody([...newArr]);
   }
 
-  function isPosIntersecting(a, b) {
+  function isPosIntersecting(
+    a: { x: number; y: number },
+    b: { x: number; y: number }
+  ) {
     const result = a.x === b.x && a.y === b.y;
     return result;
   }
 
-  function isSnakeIntersect(pos) {
+  function isSnakeIntersect(pos: { x: number; y: number }) {
     return snakeBody.some((segment) => {
       return isPosIntersecting(segment, pos);
     });
@@ -304,13 +327,15 @@ const ScoreText = styled(Text)`
 `;
 
 // Game ////////////////////////////////////////////////////////////////////////
-const GameBoard = styled.div.attrs((props) => {
+type GameBoardProps = { width: number; height: number };
+
+const GameBoard = styled.div.attrs((props: GameBoardProps) => {
   return {
     style: {
       grid: `repeat(${props.width}, 1fr) / repeat(${props.height}, 1fr)`,
     },
   };
-})`
+})<GameBoardProps>`
   background-color: ${(props) => (props.theme.isDark ? "black" : "white")};
   width: 100vw;
   aspect-ratio: 1/1;
@@ -321,10 +346,18 @@ const GameBoard = styled.div.attrs((props) => {
 `;
 
 // Snake ///////////////////////////////////////////////////////////////////////
-const Snake = (props) => {
+type SnakeProps = {
+  body: Array<{
+    x: number;
+    y: number;
+    direction: "up" | "down" | "left" | "right";
+  }>;
+};
+
+const Snake = (props: SnakeProps) => {
   return (
     <>
-      {props.body.map(({ x, y, direction }, i) => {
+      {props.body.map(({ x, y, direction }, i: number) => {
         const isHead = i == 0;
         const isBody = i != 0 && i != props.body.length - 1;
         const isTail = i == props.body.length - 1;
@@ -336,7 +369,7 @@ const Snake = (props) => {
               <SnakeBody
                 direction={direction}
                 prevBody={props.body[i - 1]}
-                nextBody={props.body[i + 1]}
+                // nextBody={props.body[i + 1]}
               />
             )}
             {isTail && <SnakeTail direction={props.body[i - 1].direction} />}
@@ -347,14 +380,16 @@ const Snake = (props) => {
   );
 };
 
-const SnakeSegment = styled.div.attrs((props) => {
+type SnakeSegmentProps = { x: number; y: number };
+
+const SnakeSegment = styled.div.attrs((props: SnakeSegmentProps) => {
   return {
     style: {
       gridColumnStart: props.x,
       gridRowStart: props.y,
     },
   };
-})`
+})<SnakeSegmentProps>`
   width: 100%;
   height: 100%;
 
@@ -363,7 +398,9 @@ const SnakeSegment = styled.div.attrs((props) => {
   }
 `;
 
-const SnakeHead = (props) => {
+type SnakeHeadProps = { direction: "up" | "down" | "left" | "right" };
+
+const SnakeHead = (props: SnakeHeadProps) => {
   return (
     <SnakeHeadOuter direction={props.direction}>
       <SnakeHeadSvg />
@@ -371,26 +408,35 @@ const SnakeHead = (props) => {
   );
 };
 
-const SnakeHeadOuter = styled.div.attrs((props) => {
+const SnakeHeadOuter = styled.div.attrs((props: SnakeHeadProps) => {
   return {
     style: {
       transform: `rotate(${directionRotateMap[props.direction]})`,
     },
   };
-})`
+})<SnakeHeadProps>`
   width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
 
   svg {
-    /* position: absolute;
+    position: absolute;
     display: block;
-    width: 150%; */
+    width: 150%;
   }
 `;
 
-const SnakeBody = ({ direction, prevBody, nextBody }) => {
+type SnakeBodyProps = {
+  direction: "up" | "down" | "left" | "right";
+  prevBody: {
+    x: number;
+    y: number;
+    direction: "up" | "down" | "left" | "right";
+  };
+};
+
+const SnakeBody = ({ direction, prevBody }: SnakeBodyProps) => {
   const isBLCorner =
     (direction == "down" && prevBody.direction == "right") ||
     (direction == "left" && prevBody.direction == "up");
@@ -437,7 +483,9 @@ const SnakeBodyOuter = styled.div`
   }
 `;
 
-const SnakeTail = (props) => {
+type SnakeTailProps = SnakeHeadProps;
+
+const SnakeTail = (props: SnakeTailProps) => {
   return (
     <SnakeTailOuter direction={props.direction}>
       <SnakeTailSvg />
@@ -445,13 +493,13 @@ const SnakeTail = (props) => {
   );
 };
 
-const SnakeTailOuter = styled.div.attrs((props) => {
+const SnakeTailOuter = styled.div.attrs((props: SnakeTailProps) => {
   return {
     style: {
       transform: `rotate(${directionRotateMap[props.direction]})`,
     },
   };
-})`
+})<SnakeTailProps>`
   width: 100%;
 `;
 
@@ -463,17 +511,20 @@ const directionRotateMap = {
 };
 
 // Food ////////////////////////////////////////////////////////////////////////
-const Food = (props) => {
-  const [icon, setIcon] = useState();
+type FoodProps = { pos: { x: number; y: number } };
+
+const foodArray = [
+  <AppleSvg key="apple" />,
+  <AvocadoSvg key="avo" />,
+  <BurgerSvg key="burger" />,
+  <CheeseSvg key="cheese" />,
+  <GrapesSvg key="grapes" />,
+];
+
+const Food = (props: FoodProps) => {
+  const [icon, setIcon] = useState(<AppleSvg key="apple" />);
 
   useEffect(() => {
-    const foodArray = [
-      <AppleSvg key="apple" />,
-      <AvocadoSvg key="avo" />,
-      <BurgerSvg key="burger" />,
-      <CheeseSvg key="cheese" />,
-      <GrapesSvg key="grapes" />,
-    ];
     const num = getRandomNumBetween(0, foodArray.length);
     setIcon(foodArray[num]);
   }, [props.pos]);
@@ -481,14 +532,14 @@ const Food = (props) => {
   return <FoodOuter pos={props.pos}>{icon}</FoodOuter>;
 };
 
-const FoodOuter = styled.div.attrs((props) => {
+const FoodOuter = styled.div.attrs((props: FoodProps) => {
   return {
     style: {
       gridColumnStart: props.pos.x,
       gridRowStart: props.pos.y,
     },
   };
-})`
+})<FoodProps>`
   width: 100%;
   height: 100%;
 
@@ -500,7 +551,7 @@ const FoodOuter = styled.div.attrs((props) => {
 `;
 
 // Mobile controls /////////////////////////////////////////////////////////////
-const MobileControls = (props) => {
+const MobileControls = (props: { updateDirection: Function }) => {
   return (
     <MobileContolsGrid>
       <div></div>
@@ -554,6 +605,6 @@ const MobileContolsGrid = styled.div`
 `;
 
 // Functions ///////////////////////////////////////////////////////////////////
-function getRandomNumBetween(min, max) {
+function getRandomNumBetween(min: number, max: number) {
   return Math.floor(Math.random() * (max - min) + min);
 }
