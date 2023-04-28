@@ -6,7 +6,7 @@ import Text from "../Text";
 import GameBoard from "../GameBoard";
 import Snake from "../Snake";
 import Food from "../Food";
-import TouchControls from "../TouchControls/TouchControls";
+import TouchControls from "../TouchControls";
 
 const SnakeGame = () => {
   // game
