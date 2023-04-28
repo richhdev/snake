@@ -289,9 +289,8 @@ const SnakeGame = () => {
         </Inner>
         <br />
         <Text style={{ textAlign: "center" }}>Score: {score}</Text>
+        <TouchControls updateDirection={updateDirectionTouch} />
       </Outer>
-
-      <TouchControls updateDirection={updateDirectionTouch} />
     </>
   );
 };

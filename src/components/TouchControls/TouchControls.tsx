@@ -5,9 +5,9 @@ import ArrowLeftSvg from "./assets/arrow-left.svg";
 import ArrowDownSvg from "./assets/arrow-down.svg";
 import ArrowRightSvg from "./assets/arrow-right.svg";
 
-const TouchControls = (props: { updateDirection: Function }) => {
-  return (
-    <TouchContolsGrid>
+const TouchControls = (props: { updateDirection: Function }) => (
+  <Outer>
+    <Grid>
       <div></div>
       <Button
         onClick={() => {
@@ -38,23 +38,28 @@ const TouchControls = (props: { updateDirection: Function }) => {
       >
         <ArrowRightSvg />
       </Button>
-    </TouchContolsGrid>
-  );
-};
+    </Grid>
+  </Outer>
+);
 
 export default TouchControls;
 
-const TouchContolsGrid = styled.div`
+const Outer = styled.div`
   display: none;
 
   @media (hover: none) and (pointer: coarse) {
-    display: grid;
-    grid: 1fr 1fr / 1fr 1fr 1fr;
-    gap: 8px;
-    text-align: center;
+    margin-top: 16px;
+    display: flex;
+    place-content: center;
+  }
+`;
 
-    svg {
-      display: block;
-    }
+const Grid = styled.div`
+  display: grid;
+  grid: 1fr 1fr / 1fr 1fr 1fr;
+  gap: 16px;
+
+  svg {
+    display: block;
   }
 `;
