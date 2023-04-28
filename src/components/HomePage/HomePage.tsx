@@ -3,12 +3,10 @@ import { ThemeProvider } from "styled-components";
 import Head from "next/head";
 import GlobalMeta from "@/components/GlobalMeta";
 import { themeDark, themeLight } from "@/theme";
-import ThemeSwitch from "@/components/ThemeSwitch";
 import GradientBackground from "@/components/GradientBackground";
-import { Outer, Header, Main, Footer, IconLink } from "./_components";
-import GithubSvg from "@/images/github-icon.svg";
-import Tagline from "@/components/Tagline";
+import { Outer, Main } from "./_components";
 import Game from "@/components/Game";
+import NavBar from "../NavBar";
 
 export default function Home() {
   const [theme, setTheme] = useState(themeLight);
@@ -36,22 +34,10 @@ export default function Home() {
       </Head>
       <ThemeProvider theme={theme}>
         <Outer>
-          <Header>
-            <ThemeSwitch callback={setThemeSwitch} />
-          </Header>
+          <NavBar setThemeSwitch={setThemeSwitch} />
           <Main>
-            <Tagline text={"<SnakeJs />"} />
             <Game />
           </Main>
-          <Footer>
-            <IconLink
-              href="https://github.com/richhdev/richh-nextjs-starter"
-              target="_blank"
-              aria-label="github"
-            >
-              <GithubSvg role="img" alt="github" />
-            </IconLink>
-          </Footer>
         </Outer>
         <GradientBackground />
       </ThemeProvider>

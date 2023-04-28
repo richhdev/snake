@@ -7,6 +7,7 @@ import GameBoard from "../GameBoard";
 import Snake from "../Snake";
 import Food from "../Food";
 import TouchControls from "../TouchControls";
+import Tagline from "../Tagline";
 
 const SnakeGame = () => {
   // game
@@ -22,7 +23,7 @@ const SnakeGame = () => {
   const [score, setScore] = useState(0);
 
   // direction
-  const initialDirection = "right";
+  const initialDirection = "down";
   const previousDirection = useRef(initialDirection);
   const [direction, setDirection] = useState<"up" | "right" | "down" | "left">(
     initialDirection
@@ -34,10 +35,10 @@ const SnakeGame = () => {
     y: number;
     direction: "up" | "down" | "left" | "right";
   }> = [
-    { x: 3, y: 9, direction: "right" },
-    { x: 2, y: 9, direction: "down" },
-    { x: 2, y: 8, direction: "down" },
-    { x: 2, y: 7, direction: "down" },
+    { x: 11, y: 4, direction: "down" },
+    { x: 11, y: 3, direction: "down" },
+    { x: 11, y: 2, direction: "down" },
+    { x: 11, y: 1, direction: "down" },
   ];
   const [snakeBody, setSnakeBody] = useState(initialSnake);
   const snakeGrowAmount = 2; // how much does the snake grow when it eats food
@@ -254,39 +255,43 @@ const SnakeGame = () => {
   return (
     <>
       <Outer>
-        {gameState === "begin" && (
-          <GameModal>
-            <Button onClick={() => setGameState("playing")}>Start Game</Button>
-          </GameModal>
-        )}
-
-        {gameState === "end" && (
-          <GameModal>
-            <center>
-              <Text>Score {score}</Text>
-              <Text>Better luck next time</Text>
-              <br />
-              <Button
-                onClick={() => {
-                  resetGame();
-                  setGameState("playing");
-                }}
-              >
-                Start again
+        <Inner>
+          {gameState === "begin" && (
+            <GameModal>
+              <Button onClick={() => setGameState("playing")}>
+                Start Game
               </Button>
-            </center>
-          </GameModal>
-        )}
+            </GameModal>
+          )}
 
-        <GameBoard width={gridWidth} height={gridHeight}>
-          <Snake body={[...snakeBody]} />
-          <Food pos={foodPos} />
-        </GameBoard>
+          {gameState === "end" && (
+            <GameModal>
+              <div>
+                <Tagline text="Better luck next time" />
+                <br />
+                <br />
+                <Button
+                  onClick={() => {
+                    resetGame();
+                    setGameState("playing");
+                  }}
+                >
+                  Start again
+                </Button>
+              </div>
+            </GameModal>
+          )}
+
+          <GameBoard width={gridWidth} height={gridHeight}>
+            <Snake body={[...snakeBody]} />
+            <Food pos={foodPos} />
+          </GameBoard>
+        </Inner>
+        <br />
+        <Text style={{ textAlign: "center" }}>Score: {score}</Text>
       </Outer>
 
-      {gameState === "playing" && (
-        <TouchControls updateDirection={updateDirectionTouch} />
-      )}
+      <TouchControls updateDirection={updateDirectionTouch} />
     </>
   );
 };
@@ -294,6 +299,10 @@ const SnakeGame = () => {
 export default SnakeGame;
 
 const Outer = styled.div`
+  padding: 8px;
+`;
+
+const Inner = styled.div`
   position: relative;
 `;
 
@@ -305,6 +314,7 @@ const GameModal = styled.div`
   background: ${(props) =>
     props.theme.isDark ? `rgba(0, 0, 0, 0.9)` : `rgba(255, 255, 255, 0.9)`};
   border-radius: 6px;
+  text-align: center;
 
   display: grid;
   place-items: center;

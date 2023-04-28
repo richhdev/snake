@@ -2,7 +2,12 @@ import { clampBuilder } from "../utils/clamp-generator";
 
 const defaultFontStack = `-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`;
 const defaultMonospaceFontStack = `Menlo, Consolas, "Ubuntu Mono", "Roboto Mono", "DejaVu Sans Mono", monospace`;
-const clampDefault = { minWidth: "576px", maxWidth: "1200px", root: "16" };
+
+export const clampDefault = {
+  minWidth: "576px",
+  maxWidth: "1200px",
+  root: "16",
+};
 
 export const fonts = {
   oswald: `"OswaldVariable"`,

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { clampBuilder } from "@/utils/clamp-generator";
 import AutoSvg from "./images/auto.svg";
 import LightSvg from "./images/light.svg";
 import DarkSvg from "./images/dark.svg";
@@ -39,30 +38,10 @@ const themeMap: ThemeMapArray = [
   },
 ];
 
-const clampDefault = { minWidth: "576px", maxWidth: "1200px", root: "16" };
-const outerPadding = clampBuilder({
-  minFontSize: "8",
-  maxFontSize: "11",
-  ...clampDefault,
-});
-const svgSize = clampBuilder({
-  minFontSize: "16",
-  maxFontSize: "22",
-  ...clampDefault,
-});
-
 const Outer = styled.div`
-  padding: ${outerPadding};
-  color: ${(props) => props.theme.color || "#fff"};
-  background: ${(props) => props.theme.backgroundColor || "#000"};
-  border-radius: 6px;
-  cursor: pointer;
-  user-select: none;
-  transition: opacity 300ms ease;
-
   svg {
     display: block;
-    width: ${svgSize};
-    height: ${svgSize};
+    width: 30px;
+    height: 30px;
   }
 `;

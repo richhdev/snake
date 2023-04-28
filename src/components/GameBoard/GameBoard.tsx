@@ -8,7 +8,7 @@ const GameBoard = styled.div.attrs((props: GameBoardProps) => {
   };
 })<GameBoardProps>`
   background-color: ${(props) => (props.theme.isDark ? "black" : "white")};
-  width: 100vw;
+  width: 100%;
   aspect-ratio: 1/1;
   max-width: 768px;
   border-radius: 6px;
