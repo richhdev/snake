@@ -47,6 +47,13 @@ export default TouchControls;
 const Outer = styled.div`
   display: flex;
   place-content: center;
+
+  /* Disable the need for a 300ms delay on touch devices.
+   * https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action#manipulation 
+   */
+  button {
+    touch-action: manipulation;
+  }
 `;
 
 const Grid = styled.div`
