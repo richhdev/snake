@@ -3,6 +3,13 @@ import SnakeHeadSvg from "./assets/snake-head.svg";
 import SnakeBodySvg from "./assets/snake-body.svg";
 import SnakeBodyCornerSvg from "./assets/snake-body-corner.svg";
 import SnakeTailSvg from "./assets/snake-tail.svg";
+import {
+  SnakeBodyProps,
+  SnakeHeadProps,
+  SnakeProps,
+  SnakeSegmentProps,
+  SnakeTailProps,
+} from "./types";
 
 const Snake = (props: SnakeProps) => {
   return (
@@ -142,26 +149,3 @@ const directionRotateMap = {
   left: "90deg",
   up: "-180deg",
 };
-
-type SnakeProps = {
-  body: Array<{
-    x: number;
-    y: number;
-    direction: "up" | "down" | "left" | "right";
-  }>;
-};
-
-type SnakeSegmentProps = { x: number; y: number };
-
-type SnakeHeadProps = { direction: "up" | "down" | "left" | "right" };
-
-type SnakeBodyProps = {
-  direction: "up" | "down" | "left" | "right";
-  prevBody: {
-    x: number;
-    y: number;
-    direction: "up" | "down" | "left" | "right";
-  };
-};
-
-type SnakeTailProps = SnakeHeadProps;

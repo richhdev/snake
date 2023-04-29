@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { ThemeProvider } from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import Head from "next/head";
 import GlobalMeta from "@/components/GlobalMeta";
 import { themeDark, themeLight } from "@/theme";
 import GradientBackground from "@/components/GradientBackground";
-import { Outer, Main } from "./_components";
+import NavBar, { navBarHeight } from "@/components//NavBar";
 import Game from "@/components/Game";
-import NavBar from "../NavBar";
 
 export default function Home() {
   const [theme, setTheme] = useState(themeLight);
@@ -44,3 +43,18 @@ export default function Home() {
     </>
   );
 }
+
+const Outer = styled.div`
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
+const Main = styled.main`
+  padding-top: ${navBarHeight};
+  height: 100vh;
+`;

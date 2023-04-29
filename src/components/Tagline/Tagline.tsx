@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useState, useEffect, useRef } from "react";
-import typewriterText from "@/components/typewriterText";
+import typewriterText from "@/utils/typewriterText";
 import Text from "@/components/Text";
 
 const Tagline = (props: { text: string }) => {

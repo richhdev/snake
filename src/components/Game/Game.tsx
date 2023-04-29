@@ -8,6 +8,7 @@ import Snake from "../Snake";
 import Food from "../Food";
 import TouchControls from "../TouchControls";
 import Tagline from "../Tagline";
+import { DirectionMap, Directions } from "./types";
 
 const SnakeGame = () => {
   // game
@@ -324,12 +325,3 @@ const LayoutTouchControls = styled.div`
     display: block;
   }
 `;
-
-type Directions = "up" | "right" | "down" | "left";
-
-type DirectionMap = {
-  ArrowUp: "up";
-  ArrowRight: "right";
-  ArrowDown: "down";
-  ArrowLeft: "left";
-};

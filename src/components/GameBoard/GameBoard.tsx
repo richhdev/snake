@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { GameBoardProps } from "./types";
 
 const GameBoard = styled.div.attrs((props: GameBoardProps) => {
   return {
@@ -14,7 +15,5 @@ const GameBoard = styled.div.attrs((props: GameBoardProps) => {
 
   display: grid;
 `;
-
-type GameBoardProps = { gridColumns: number; gridRows: number };
 
 export default GameBoard;

@@ -6,6 +6,7 @@ import AvocadoSvg from "./assets/avocado.svg";
 import BurgerSvg from "./assets/burger.svg";
 import CheeseSvg from "./assets/cheese.svg";
 import GrapesSvg from "./assets/grapes.svg";
+import { FoodProps } from "./types";
 
 const Food = (props: FoodProps) => {
   const [icon, setIcon] = useState(<AppleSvg key="apple" />);
@@ -45,5 +46,3 @@ const FoodOuter = styled.div.attrs((props: FoodProps) => {
     width: 100%;
   }
 `;
-
-type FoodProps = { pos: { x: number; y: number } };

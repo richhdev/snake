@@ -5,6 +5,7 @@ import GithubSvg from "@/images/github-icon.svg";
 import ThemeSwitch from "@/components/ThemeSwitch";
 import Text from "../Text";
 import Tagline from "../Tagline";
+import { NavBarProps } from "./types";
 
 const NavBar = (props: NavBarProps) => (
   <NavBarOuter>
@@ -154,9 +155,3 @@ const IconLink = styled.a`
     }
   }
 `;
-
-type NavBarProps = {
-  mobileNavActive?: boolean;
-  setMobileNavActive?: Function;
-  setThemeSwitch: Function;
-};
