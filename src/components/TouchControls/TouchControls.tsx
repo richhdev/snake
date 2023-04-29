@@ -5,35 +5,35 @@ import ArrowLeftSvg from "./assets/arrow-left.svg";
 import ArrowDownSvg from "./assets/arrow-down.svg";
 import ArrowRightSvg from "./assets/arrow-right.svg";
 
-const TouchControls = (props: { updateDirection: Function }) => (
+const TouchControls = ({ callback }: { callback: Function }) => (
   <Outer>
     <Grid>
-      <div></div>
+      <div />
       <Button
         onClick={() => {
-          props.updateDirection("ArrowUp");
+          callback("up");
         }}
       >
         <ArrowUpSvg />
       </Button>
-      <div></div>
+      <div />
       <Button
         onClick={() => {
-          props.updateDirection("ArrowLeft");
+          callback("left");
         }}
       >
         <ArrowLeftSvg />
       </Button>
       <Button
         onClick={() => {
-          props.updateDirection("ArrowDown");
+          callback("down");
         }}
       >
         <ArrowDownSvg />
       </Button>
       <Button
         onClick={() => {
-          props.updateDirection("ArrowRight");
+          callback("right");
         }}
       >
         <ArrowRightSvg />

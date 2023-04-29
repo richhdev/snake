@@ -25,15 +25,13 @@ const SnakeGame = () => {
   // direction
   const initialDirection = "down";
   const previousDirection = useRef(initialDirection);
-  const [direction, setDirection] = useState<"up" | "right" | "down" | "left">(
-    initialDirection
-  );
+  const [direction, setDirection] = useState<Directions>(initialDirection);
 
   // snake
   const initialSnake: Array<{
     x: number;
     y: number;
-    direction: "up" | "down" | "left" | "right";
+    direction: Directions;
   }> = [
     { x: 11, y: 4, direction: "down" },
     { x: 11, y: 3, direction: "down" },
@@ -50,15 +48,39 @@ const SnakeGame = () => {
   // game loop
   useEffect(() => {
     requestAnimationFrameRef.current = requestAnimationFrame(animate);
-    window.addEventListener("keydown", updateDirection);
-
     return () => {
       cancelAnimationFrame(requestAnimationFrameRef.current);
-      window.removeEventListener("keydown", updateDirection);
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState, gameOver, foodPos, direction]);
+
+  // keyboard listener
+  useEffect(() => {
+    function keyDownHandler(e: KeyboardEvent) {
+      if (gameState !== "playing") return;
+
+      if (
+        e.key === "ArrowUp" ||
+        e.key === "ArrowRight" ||
+        e.key === "ArrowDown" ||
+        e.key === "ArrowLeft"
+      ) {
+        e.preventDefault(); // prevent the page scrolling up/down
+        const directionMap: DirectionMap = {
+          ArrowUp: "up",
+          ArrowRight: "right",
+          ArrowDown: "down",
+          ArrowLeft: "left",
+        };
+        updateDirection(directionMap[e.key as keyof DirectionMap]);
+      }
+    }
+    window.addEventListener("keydown", keyDownHandler);
+    return () => {
+      window.removeEventListener("keydown", keyDownHandler);
+    };
+  }, [gameState]);
 
   const animate = (time: number) => {
     if (gameState === "begin") {
@@ -89,55 +111,13 @@ const SnakeGame = () => {
     setGameOver(false);
   }
 
-  // keyboard input
-  function updateDirection(e: KeyboardEvent) {
-    if (
-      e.key === "ArrowUp" ||
-      e.key === "ArrowRight" ||
-      e.key === "ArrowDown" ||
-      e.key === "ArrowLeft"
-    ) {
-      e.preventDefault(); // prevent the page form scrolling when user hits up / down keys
-
-      const directionMap = {
-        ArrowUp: previousDirection.current !== "down" ? "up" : false,
-        ArrowRight: previousDirection.current !== "left" ? "right" : false,
-        ArrowDown: previousDirection.current !== "up" ? "down" : false,
-        ArrowLeft: previousDirection.current !== "right" ? "left" : false,
-      };
-
-      const nextDirection = directionMap[e.key];
-      if (
-        nextDirection === "up" ||
-        nextDirection === "right" ||
-        nextDirection === "down" ||
-        nextDirection === "left"
-      ) {
-        setDirection(nextDirection);
-      }
-    }
-  }
-
-  // touch controls
-  function updateDirectionTouch(
-    newDir: "ArrowUp" | "ArrowRight" | "ArrowDown" | "ArrowLeft"
-  ) {
-    const directionMap = {
-      ArrowUp: previousDirection.current !== "down" ? "up" : false,
-      ArrowRight: previousDirection.current !== "left" ? "right" : false,
-      ArrowDown: previousDirection.current !== "up" ? "down" : false,
-      ArrowLeft: previousDirection.current !== "right" ? "left" : false,
-    };
-
-    const nextDirection = directionMap[newDir];
-    if (
-      nextDirection === "up" ||
-      nextDirection === "right" ||
-      nextDirection === "down" ||
-      nextDirection === "left"
-    ) {
-      setDirection(nextDirection);
-    }
+  function updateDirection(selected: Directions) {
+    // cant go back on yourself
+    if (selected === "up" && previousDirection.current === "down") return;
+    if (selected === "right" && previousDirection.current === "left") return;
+    if (selected === "down" && previousDirection.current === "up") return;
+    if (selected === "left" && previousDirection.current === "right") return;
+    setDirection(selected);
   }
 
   function updateSnake() {
@@ -294,7 +274,7 @@ const SnakeGame = () => {
       </LayoutScore>
 
       <LayoutTouchControls>
-        <TouchControls updateDirection={updateDirectionTouch} />
+        <TouchControls callback={updateDirection} />
       </LayoutTouchControls>
     </Layout>
   );
@@ -352,3 +332,12 @@ const LayoutTouchControls = styled.div`
     display: block;
   }
 `;
+
+type Directions = "up" | "right" | "down" | "left";
+
+type DirectionMap = {
+  ArrowUp: "up";
+  ArrowRight: "right";
+  ArrowDown: "down";
+  ArrowLeft: "left";
+};
