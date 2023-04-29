@@ -25,7 +25,8 @@ const NavBar = (props: NavBarProps) => (
         >
           <GithubSvg role="img" alt="github" />
         </IconLink>
-        <IconLink>
+        <IconLink as="button" aria-labelledby="themeSwitchLabel">
+          <span className="sr-only">Change Theme</span>
           <ThemeSwitch callback={props.setThemeSwitch} />
         </IconLink>
       </NavBarGroup3>
@@ -92,6 +93,9 @@ const iconLinkTransition = "filter 300ms ease, transform 300ms ease";
 const iconLinkDropshadow = "drop-shadow(0px 0px 6px rgba(0, 0, 0, 0.5));";
 
 const IconLink = styled.a`
+  border: none;
+  background: none;
+
   svg {
     display: block;
     position: relative;
