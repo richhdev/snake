@@ -341,7 +341,6 @@ const GameContainer = styled.div`
   position: relative;
   aspect-ratio: 1/1;
   max-height: 100%;
-  background: black;
   margin: 0 auto;
 `;
 
