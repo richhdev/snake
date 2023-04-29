@@ -13,8 +13,8 @@ const SnakeGame = () => {
   // game
   const [gameState, setGameState] = useState("begin");
   const [gameOver, setGameOver] = useState(false);
-  const gridWidth = 21;
-  const gridHeight = 21;
+  const gridColumns = 21;
+  const gridRows = 21;
   const requestAnimationFrameRef = useRef(0);
   const previousTimeRef = useRef(0);
   const initialGameSpeed = 250;
@@ -168,7 +168,7 @@ const SnakeGame = () => {
     // snake should wrap when hitting a wall
     if (snakeWrap) {
       const minVal = 0;
-      const maxVal = axis === "x" ? gridWidth + 1 : gridHeight + 1;
+      const maxVal = axis === "x" ? gridColumns + 1 : gridRows + 1;
       if (newArr[0][axis] === minVal) {
         newArr[0][axis] = maxVal - 1;
       } else if (newArr[0][axis] === maxVal) {
@@ -226,8 +226,8 @@ const SnakeGame = () => {
 
     while (newPos === null || isSnakeIntersect(newPos)) {
       newPos = {
-        x: getRandomNumBetween(1, gridWidth - 1),
-        y: getRandomNumBetween(1, gridHeight - 1),
+        x: getRandomNumBetween(1, gridColumns - 1),
+        y: getRandomNumBetween(1, gridRows - 1),
       };
     }
 
@@ -247,15 +247,15 @@ const SnakeGame = () => {
     return (
       sbakeHead.x < 1 ||
       sbakeHead.y < 1 ||
-      sbakeHead.x > gridWidth ||
-      sbakeHead.y > gridHeight
+      sbakeHead.x > gridColumns ||
+      sbakeHead.y > gridRows
     );
   }
 
   return (
-    <>
-      <Outer>
-        <Inner>
+    <Layout>
+      <LayoutGame>
+        <GameContainer>
           {gameState === "begin" && (
             <GameModal>
               <Button onClick={() => setGameState("playing")}>
@@ -282,16 +282,21 @@ const SnakeGame = () => {
             </GameModal>
           )}
 
-          <GameBoard width={gridWidth} height={gridHeight}>
+          <GameBoard gridColumns={gridColumns} gridRows={gridRows}>
             <Snake body={[...snakeBody]} />
             <Food pos={foodPos} />
           </GameBoard>
-        </Inner>
-        <br />
+        </GameContainer>
+      </LayoutGame>
+
+      <LayoutScore>
         <Text style={{ textAlign: "center" }}>Score: {score}</Text>
+      </LayoutScore>
+
+      <LayoutTouchControls>
         <TouchControls updateDirection={updateDirectionTouch} />
-      </Outer>
-    </>
+      </LayoutTouchControls>
+    </Layout>
   );
 };
 
@@ -317,4 +322,34 @@ const GameModal = styled.div`
 
   display: grid;
   place-items: center;
+`;
+
+const Layout = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px;
+`;
+
+const LayoutGame = styled.div`
+  overflow: hidden;
+`;
+
+const GameContainer = styled.div`
+  position: relative;
+  aspect-ratio: 1/1;
+  max-height: 100%;
+  background: black;
+  margin: 0 auto;
+`;
+
+const LayoutScore = styled.div``;
+
+const LayoutTouchControls = styled.div`
+  display:none;
+  @media (hover: none) and (pointer: coarse) {
+    display::block;
+  }
 `;

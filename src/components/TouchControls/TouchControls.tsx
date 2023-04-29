@@ -45,13 +45,8 @@ const TouchControls = (props: { updateDirection: Function }) => (
 export default TouchControls;
 
 const Outer = styled.div`
-  display: none;
-
-  @media (hover: none) and (pointer: coarse) {
-    margin-top: 16px;
-    display: flex;
-    place-content: center;
-  }
+  display: flex;
+  place-content: center;
 `;
 
 const Grid = styled.div`

@@ -13,7 +13,5 @@ export const Outer = styled.div`
 
 export const Main = styled.main`
   padding-top: ${navBarHeight};
-  flex-grow: 1;
-  display: grid;
-  place-items: center;
+  height: 100vh;
 `;
