@@ -347,8 +347,8 @@ const GameContainer = styled.div`
 const LayoutScore = styled.div``;
 
 const LayoutTouchControls = styled.div`
-  display:none;
+  display: none;
   @media (hover: none) and (pointer: coarse) {
-    display::block;
+    display: block;
   }
 `;
