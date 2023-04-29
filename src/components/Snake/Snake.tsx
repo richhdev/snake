@@ -16,11 +16,7 @@ const Snake = (props: SnakeProps) => {
           <SnakeSegment key={`snake-segment-${i}`} x={x} y={y}>
             {isHead && <SnakeHead direction={direction} />}
             {isBody && (
-              <SnakeBody
-                direction={direction}
-                prevBody={props.body[i - 1]}
-                // nextBody={props.body[i + 1]}
-              />
+              <SnakeBody direction={direction} prevBody={props.body[i - 1]} />
             )}
             {isTail && <SnakeTail direction={props.body[i - 1].direction} />}
           </SnakeSegment>

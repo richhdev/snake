@@ -282,14 +282,6 @@ const SnakeGame = () => {
 
 export default SnakeGame;
 
-const Outer = styled.div`
-  padding: 8px;
-`;
-
-const Inner = styled.div`
-  position: relative;
-`;
-
 const GameModal = styled.div`
   position: absolute;
   z-index: 1;
