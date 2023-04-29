@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styled, { ThemeProvider } from "styled-components";
 import Head from "next/head";
 import GlobalMeta from "@/components/GlobalMeta";
+import googleTag from "@/analytics/googleTag";
 import { themeDark, themeLight } from "@/theme";
 import GradientBackground from "@/components/GradientBackground";
 import NavBar, { navBarHeight } from "@/components//NavBar";
@@ -31,6 +32,9 @@ export default function Home() {
         <meta name="description" content="Richh NextJS Starter" />
         <GlobalMeta />
       </Head>
+
+      {googleTag}
+
       <ThemeProvider theme={theme}>
         <Outer>
           <NavBar setThemeSwitch={setThemeSwitch} />
